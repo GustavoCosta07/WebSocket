@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atualização de Idade</title>
+  </head>
+  <body>
+    <h1>Atualização de Idade</h1>
+    <div>
+      <label for="idadeAtual">Idade Atual:</label>
+      <input type="text" id="idadeAtual" readonly />
+    </div>
+
+    <div>
+      <label for="novaIdade">Nova Idade:</label>
+      <input type="text" id="novaIdade" required />
+    </div>
+
+    <button type="button" onclick="atualizarIdade()">Atualizar Idade</button>
+
+    <script>
+      window.addEventListener("load", (event) => {
+        fetch(`http://localhost:3000/updateAge`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                `Erro na requisição: ${response.status} - ${response.statusText}`
+              );
+            }
+            return response.json();
+          })
+          .then((usuario) => {
+            document.getElementById("idadeAtual").value = usuario.idade
+          })
+          .catch((error) => {
+            console.error("Erro na requisição:", error);
+            document.getElementById("usuarioEncontrado").innerHTML =
+              "Erro na requisição. Verifique o console para mais detalhes.";
+          });
+      });
+
+      const ws = new WebSocket("ws://localhost:3000");
+
+      function atualizarIdade() {
+        const novaIdade = document.getElementById("novaIdade").value;
+
+        const data = {
+          type: "atualizarIdade",
+          novaIdade,
+        };
+
+        ws.send(JSON.stringify(data));
+      }
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        document.getElementById("idadeAtual").value = data.idade
+        const novaIdade = document.getElementById("novaIdade").value ="";
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Usuário</title>
+</head>
+<body>
+  <h1>Cadastro de Usuário</h1>
+  <form id="cadastroForm">
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" name="nome" required><br>
+
+    <label for="telefone">Telefone:</label>
+    <input type="text" id="telefone" name="telefone" required><br>
+
+    <label for="username">Nome de Usuário:</label>
+    <input type="text" id="username" name="username" required><br>
+
+    <label for="idade">Idade:</label>
+    <input type="text" id="idade" name="idade" required><br>
+
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" name="senha" required><br>
+
+    <label for="confirmacao">Confirmação de Senha:</label>
+    <input type="password" id="confirmacao" name="confirmacao" required><br>
+
+    <button type="button" onclick="cadastrar()">Cadastrar</button>
+  </form>
+
+  <div id="resultado"></div>
+
+  <script>
+    const ws = new WebSocket('ws://localhost:3000');
+
+    function cadastrar() {
+      const nome = document.getElementById('nome').value;
+      const telefone = document.getElementById('telefone').value;
+      const username = document.getElementById('username').value;
+      const idade = document.getElementById('idade').value;
+      const senha = document.getElementById('senha').value;
+      const confirmacao = document.getElementById('confirmacao').value;
+
+      if (senha !== confirmacao) {
+        alert('As senhas não coincidem.');
+        return;
+      }
+
+      const userData = {
+        nome,
+        telefone,
+        username,
+        idade,
+        senha,
+        type: 'cadastro'
+      };
+
+      ws.send(JSON.stringify(userData));
+    }
+
+    ws.onmessage = (event) => {
+      const response = JSON.parse(event.data);
+      document.getElementById('resultado').innerHTML = `
+        <p>${response.greeting}</p>
+        <p>${response.username}</p>
+        <p>${response.password}</p>
+      `;
+    };
+  </script>
+</body>
+</html>
